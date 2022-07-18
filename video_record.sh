@@ -10,7 +10,7 @@ record_height=1080
 record_name=video_part
 record_format=%04d
 record_extension=.h264
-max_bytes_storage_threshold=1000000
+max_bytes_storage_threshold=5000000
 
 log() {
 	local timestamp="`date +\"${log_format}\"`"
@@ -38,10 +38,11 @@ is_recording() {
 delete_oldest_video_parts() {
 	local oldest_video_part_path=`ls ${save_path}/${record_name}* -t | tail -1`
 	if [[ ! -z "${oldest_video_part_path}" ]]; then
-		log "Deleting ${oldest_video_part_path}"
+		local modified_date=`date --reference=${oldest_video_part_path}`
+		log "Deleting ${oldest_video_part_path} modified at ${modified_date}"
 		rm ${oldest_video_part_path}
 	else
-		log "Nothing to delete"
+		log "Nothing to delete - check thresholds and used/max file system size"
 	fi	
 }
 
