@@ -11,6 +11,7 @@ record_name=video_part
 record_format=%04d
 record_extension=.h264
 max_bytes_storage_threshold=5000000
+max_percentage_storage_threshold=20
 
 log() {
 	local timestamp="`date +\"${log_format}\"`"
@@ -50,8 +51,8 @@ clean_oldest_video_parts_check() {
 	root_stats=`df | grep "/dev/root"`
 	used_bytes=`echo ${root_stats} | awk '{print $3}'`
 	#available_bytes=`echo ${root_stats} | awk '{print $4}'`
-	#percentage_used=`echo ${root_stats} | awk '{print $4}' | sed 's/.$//`
-	if [ "$used_bytes" -gt "$max_bytes_storage_threshold" ]; then
+	percentage_used=`echo ${root_stats} | awk '{print $5}' | sed 's/.$//'`
+	if [ "$used_bytes" -gt "$max_bytes_storage_threshold" ] | [ "$percentage_used" -gt "$max_percentage_storage_threshold" ]; then
 		delete_oldest_video_parts
 	fi
 }
