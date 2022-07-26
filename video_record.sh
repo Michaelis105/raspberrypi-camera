@@ -10,8 +10,6 @@ record_height=1080
 record_name=video_part
 record_format=%04d
 record_extension=.h264
-max_bytes_storage_threshold=5000000
-max_percentage_storage_threshold=20
 
 log() {
 	local timestamp="`date +\"${log_format}\"`"
@@ -32,31 +30,6 @@ kill_record() {
 	pkill -P $$ sleep
 }
 
-is_recording() {
-	echo `ps -C libcamera-vid -o pid= `
-}
-
-delete_oldest_video_parts() {
-	local oldest_video_part_path=`ls ${save_path}/${record_name}* -t | tail -1`
-	if [[ ! -z "${oldest_video_part_path}" ]]; then
-		local modified_date=`date --reference=${oldest_video_part_path}`
-		log "Deleting ${oldest_video_part_path} modified at ${modified_date}"
-		rm ${oldest_video_part_path}
-	else
-		log "Nothing to delete - check thresholds and used/max file system size"
-	fi	
-}
-
-clean_oldest_video_parts_check() {
-	root_stats=`df | grep "/dev/root"`
-	used_bytes=`echo ${root_stats} | awk '{print $3}'`
-	#available_bytes=`echo ${root_stats} | awk '{print $4}'`
-	percentage_used=`echo ${root_stats} | awk '{print $5}' | sed 's/.$//'`
-	if [ "$used_bytes" -gt "$max_bytes_storage_threshold" ] | [ "$percentage_used" -gt "$max_percentage_storage_threshold" ]; then
-		delete_oldest_video_parts
-	fi
-}
-
 log "Script start"
 
 if test -f ${config_path}; then
@@ -67,6 +40,8 @@ else
 fi
 
 log "Recording start"
+
+trap kill_record SIGINT
 
 # --flush: Write frames to disk immediately without waiting for video to stop recording.
 # --inline: Allow viewing video sequences from any frame, useful for video seeking.
@@ -79,24 +54,7 @@ libcamera-vid \
 	--flush	\
 	--inline \
 	--nopreview true \
-	&
 
-# Give libcamera time to start recording.
-sleep 2
-
-trap kill_record SIGINT
-
-log "Record loop start"
-
-while : ; do
-	is_record=`is_recording`
-	if [[ -z "${is_record}" ]]; then
-		log "Record loop end"
-		break
-	fi
-	clean_oldest_video_parts_check
-	log "Alive"
-	sleep 10
-done
+log "Recording end"
 
 log "Script end"
