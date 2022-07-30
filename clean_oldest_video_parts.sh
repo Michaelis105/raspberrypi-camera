@@ -27,13 +27,17 @@ delete_oldest_video_parts() {
 }
 
 clean_oldest_video_parts_check() {
-	root_stats=`df | grep "/dev/root"`
-	used_bytes=`echo ${root_stats} | awk '{print $3}'`
-	#available_bytes=`echo ${root_stats} | awk '{print $4}'`
-	percentage_used=`echo ${root_stats} | awk '{print $5}' | sed 's/.$//'`
-	if [ "$used_bytes" -gt "$max_bytes_storage_threshold" ] | [ "$percentage_used" -gt "$max_percentage_storage_threshold" ]; then
-		delete_oldest_video_parts
-	fi
+	while [ true ]; do
+		root_stats=`df | grep "/dev/root"`
+		used_bytes=`echo ${root_stats} | awk '{print $3}'`
+		#available_bytes=`echo ${root_stats} | awk '{print $4}'`
+		percentage_used=`echo ${root_stats} | awk '{print $5}' | sed 's/.$//'`
+		if [ "$used_bytes" -gt "$max_bytes_storage_threshold" ] | [ "$percentage_used" -gt "$max_percentage_storage_threshold" ]; then
+			delete_oldest_video_parts
+		else
+			break
+		fi
+	done
 }
 
 log "Clean-up start"
