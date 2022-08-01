@@ -1,12 +1,12 @@
 #!/bin/bash
 
-save_path=${HOME}
+save_path=/mnt/usb
 log_path=${save_path}/video.log
 log_format="%m/%d/%Y %X.%N %z"
 record_name=video_part
 record_extension=.h264
 max_bytes_storage_threshold=5000000
-max_percentage_storage_threshold=20
+max_percentage_storage_threshold=80
 
 log() {
 	local timestamp="`date +\"${log_format}\"`"
@@ -28,7 +28,7 @@ delete_oldest_video_parts() {
 
 clean_oldest_video_parts_check() {
 	while [ true ]; do
-		root_stats=`df | grep "/dev/root"`
+		root_stats=`df | grep "/mnt/usb"`
 		used_bytes=`echo ${root_stats} | awk '{print $3}'`
 		#available_bytes=`echo ${root_stats} | awk '{print $4}'`
 		percentage_used=`echo ${root_stats} | awk '{print $5}' | sed 's/.$//'`

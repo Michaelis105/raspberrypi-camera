@@ -1,10 +1,12 @@
 #!/bin/bash
 
-save_path=${HOME}
+# Recommended save to external USB and not SD card sharing boot. 
+# Known issues with PREEMPT SMP kernel panics with user/kernel paging request addresses
+save_path=/mnt/usb
 log_path=${save_path}/video.log
 log_format="%m/%d/%Y %X.%N %z"
 config_path=${save_path}/my_libcamera-vid.config
-record_interval=30000
+record_interval=60000
 record_width=1920
 record_height=1080
 record_name=video_part
