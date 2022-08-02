@@ -27,9 +27,9 @@ libcamera will write video frames to save path immediately.
 
 ## How to Install Cron Jobs
 
-Update root's crontab for USB access. Probably not the most secure usage.
+Useful to auto-record on startup without manual human intervention.
 
-1. Open root's crontab `sudo crontab -e`.
+1. Open crontab `crontab -e`.
 2. Insert line `@reboot /home/<user>/video_record.sh` to start recording on boot.
 3. Insert line `* * * * * /home/<user>/clean_oldest_video_parts.sh > /dev/null 2>&1` to clean up older video artifacts periodically.
 4. Save and Exit.
@@ -61,7 +61,7 @@ Useful for saving videos and logs to external storage.
 
 ## How to Recover from Broken /etc/fstab
 
-Raspberry PI may no longer boot in the event of an incorrect /etc/fstab entry.
+Raspberry PI may no longer boot in the event of an incorrect `/etc/fstab` entry.
 
 1. Append `init=/bin/sh` to first line `cmdline.txt` in `/boot` partition of operating system SD card. May need separate device to rewrite this file. Do not add line.
 2. Reboot Raspberry PI with this setting.
